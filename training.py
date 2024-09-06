@@ -428,7 +428,7 @@ def check_dict(model_dict, training_dict, env_dict, vector_dict = None):
 
 def save_to_xlsx(vector_dict, model_dict, training_dict, env_dict, policy_dict, info, xlsx_name):
     """
-    Saves the results to an Excel file.
+    Saves the results to an Excel file. xlsx_name is the name of the Excel file to save the results to, with format "{filename}-{sheetname}". If sheetname is not provided, it will be "New".
 
     Attributes:
         vector_dict (dict): the parameters for the vectorized version
@@ -471,6 +471,8 @@ def save_to_xlsx(vector_dict, model_dict, training_dict, env_dict, policy_dict, 
     except FileNotFoundError:
         print("File not found. Creating a new one.")
         workbook = openpyxl.Workbook()
+    if sheet_name is None:
+        sheet_name = "New"
     if sheet_name not in workbook.sheetnames:
         sheet = workbook.create_sheet(sheet_name)
         sheet.append(["Model", "Policy", "Vectorized", "Vector Size", "Shuffle Vector", "Max Iteration", "Timesteps", "Data", "n_steps", "batch_size", "net_arch", "random_nn", "random_data", "cardinality_constraint", "card mode", "lambda", "shrinkage", "sigma", "Value", "Return", "Variance", "Time", "Optimal Weights"])
