@@ -1,0 +1,9 @@
+gurobipy<=11.0.2
+gymnasium<=0.29.1
+matplotlib<=3.9.1
+numpy<=1.26.0
+pandas<=2.2.2
+scipy<=1.14.0
+stable_baselines3<=2.3.2
+torch<=2.3.1
+yfinance<=0.2.40
