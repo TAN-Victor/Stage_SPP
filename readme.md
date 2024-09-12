@@ -33,8 +33,9 @@ numpy version can't be higher than 2.0.
 
 SSP-MV-Vect.ipynb should be the only file that can be modified. You can change the dictionaries. When keys are not provided or have incorrect types, you will receive a log message, for instance "Key policy not in dict."
 
-The message "Could not render content for 'application/vnd.jupyter.widget-view+json'{"model_id":"7303795a1f0c472a951d906b978b2f38","version_major":2,"version_minor":0}" might appear but is simply a loading / saving error and will not affect the functionality.
+The message "Could not render content for 'application/vnd.jupyter.widget-view+json'{"model_id":"...","version_major":2,"version_minor":0}" might appear but is simply a loading / saving error and will not affect the functionality.
 
+**Notes:** When executed, the program will save the model in a folder "models". **Each model is around 1.06 Go, so make sure you have sufficient storage space.**
 
 ## Files & Folders
 

@@ -38,7 +38,7 @@ Default_model_dict = {
 }
 
 Default_training_dict = {
-    "max_iteration": (5, int),
+    "seed": (5, int),
     "n_timesteps": (10000, int),
 }
 
@@ -113,18 +113,18 @@ def DRL_vect(vector_dict, model_dict, training_dict, env_dict, policy_dict):
     Attributes:
         vector_dict (dict): the parameters for the vectorized version
             - vector_size (int): the number of environments to run in parallel
-            - seed (int): the seed to use for shuffling the columns of the data, default is max_iteration
+            - seed (int): the seed to use for shuffling the columns of the data, default is 5
             - subsample (int): the number of columns to subsample from the data, default is -1 which means all columns
             - shuffle (bool): whether to shuffle the columns of the data across the environments, default is True, can't be False if subsample is not -1
         model_dict (dict): the model to use and its parameters for learning
             - model_name (class from stable_baselines3): the model to use
             - policy (str): the policy to use, str class from stable_baselines3
             - device (str): the device to use, default is "cuda:0"
-            - seed (int): the seed to use for the model, default is max_iteration
+            - seed (int): the seed to use for the model, default is 5
             - n_steps (int): the number of steps to use for training before updating the model, default is 5 for A2C, 2048 for PPO
             - batch_size (int) [only for PPO]: the batch size to use for training, default is 64
         training_dict (dict): the training parameters
-            - max_iteration (int): the number of iterations to train and test the model on
+            - seed (int): the seed to use for the model, default is 5
             - n_timesteps (int): the total timesteps to train the model on
             - save_model (str): the name of the file to save the model to
         env_dict (dict): the environment parameters
@@ -162,7 +162,7 @@ def DRL_vect(vector_dict, model_dict, training_dict, env_dict, policy_dict):
     model_name = model_dict["model_name"]
     model_dict["env"] = DummyVec
     model_dict["policy_kwargs"] = policy_dict
-    model_dict["seed"] = training_dict["max_iteration"]
+    model_dict["seed"] = training_dict["seed"]
     model_dict_copy = model_dict.copy()
     del model_dict_copy["model_name"]
     model = model_name(**model_dict_copy)
@@ -178,10 +178,10 @@ def DRL_vect(vector_dict, model_dict, training_dict, env_dict, policy_dict):
     time_start = time()
     env_list = []
     for i in range(vector_dict["vector_size"]):
-        env_list.append(env_creator(training_dict["max_iteration"]))
+        env_list.append(env_creator(training_dict["seed"]))
     DummyVec = DummyVecEnv([(lambda env: lambda: env)(outer_env) for outer_env in env_list])
     obs = DummyVec.reset()
-    model.set_random_seed(training_dict["max_iteration"])
+    model.set_random_seed(training_dict["seed"])
     for _ in tqdm(range(m - 1)):
         action, states = model.predict(obs)
         obs, rewards, done, info_d = DummyVec.step(action)
@@ -322,18 +322,18 @@ def SSP_MV_vect(vector_dict, model_dict, training_dict, env_dict, policy_dict, x
     Attributes:
         vector_dict (dict): the parameters for the vectorized version
             - vector_size (int): the number of environments to run in parallel
-            - seed (int): the seed to use for shuffling the columns of the data, default is max_iteration
+            - seed (int): the seed to use for shuffling the columns of the data, default is 5
             - subsample (int): the number of columns to subsample from the data, default is -1 which means all columns
             - shuffle (bool): whether to shuffle the columns of the data across the environments, default is True, can't be False if subsample is not -1
         model_dict (dict): the model to use and its parameters for learning
             - model_name (class from stable_baselines3): the model to use
             - policy (str): the policy to use, str class from stable_baselines3
             - device (str): the device to use, default is "cuda:0"
-            - seed (int): the seed to use for the model, default is max_iteration
+            - seed (int): the seed to use for the model, default is 5
             - n_steps (int): the number of steps to use for training before updating the model, default is 5 for A2C, 2048 for PPO
             - batch_size (int) [only for PPO]: the batch size to use for training, default is 64
         training_dict (dict): the training parameters
-            - max_iteration (int): the number of iterations to train and test the model on
+            - seed (int): the seed to use for the model, default is 5   
             - n_timesteps (int): the total timesteps to train the model on
             - save_model (str): the name of the file to save the model to
         env_dict (dict): the environment to use and its parameters
@@ -410,12 +410,12 @@ def check_dict(model_dict, training_dict, env_dict, vector_dict = None):
             model_dict["batch_size"] = 64
         if "n_steps" not in model_dict:
             model_dict["n_steps"] = 64
-    model_dict["seed"] = training_dict["max_iteration"]
+    model_dict["seed"] = training_dict["seed"]
     if env_dict["sigma"] > 1 or env_dict["sigma"] < 0:
         env_dict["sigma"] = 0.1
         print("Sigma must be between 0 and 1. Using default value 0.1.")
     if vector_dict is not None:
-        vector_dict["seed"] = training_dict["max_iteration"]
+        vector_dict["seed"] = training_dict["seed"]
         if vector_dict["subsample"] != -1 and not vector_dict["shuffle"]:
             vector_dict["shuffle"] = True
             print("Can't have shuffle = False if subsample is not -1. Setting shuffle = True.")
@@ -433,18 +433,18 @@ def save_to_xlsx(vector_dict, model_dict, training_dict, env_dict, policy_dict, 
     Attributes:
         vector_dict (dict): the parameters for the vectorized version
             - vector_size (int): the number of environments to run in parallel
-            - seed (int): the seed to use for shuffling the columns of the data, default is max_iteration
+            - seed (int): the seed to use for shuffling the columns of the data, default is 5
             - subsample (int): the number of columns to subsample from the data, default is -1 which means all columns
             - shuffle (bool): whether to shuffle the columns of the data across the environments, default is True, can't be False if subsample is not -1
         model_dict (dict): the model to use and its parameters for learning
             - model_name (class from stable_baselines3): the model to use
             - policy (str): the policy to use, str class from stable_baselines3
             - device (str): the device to use, default is "cuda:0"
-            - seed (int): the seed to use for the model, default is max_iteration
+            - seed (int): the seed to use for the model, default is 5
             - n_steps (int): the number of steps to use for training before updating the model, default is 5 for A2C, 2048 for PPO
             - batch_size (int) [only for PPO]: the batch size to use for training, default is 64
         training_dict (dict): the training parameters
-            - max_iteration (int): the number of iterations to train and test the model on
+            - seed (int): the seed to use for the model, default is 5
             - n_timesteps (int): the total timesteps to train the model on
             - save_model (str): the name of the file to save the model to
         env_dict (dict): the environment to use and its parameters
@@ -475,7 +475,7 @@ def save_to_xlsx(vector_dict, model_dict, training_dict, env_dict, policy_dict, 
         sheet_name = "New"
     if sheet_name not in workbook.sheetnames:
         sheet = workbook.create_sheet(sheet_name)
-        sheet.append(["Model", "Policy", "Vectorized", "Vector Size", "Shuffle Vector", "Max Iteration", "Timesteps", "Data", "n_steps", "batch_size", "net_arch", "random_nn", "random_data", "cardinality_constraint", "card mode", "lambda", "shrinkage", "sigma", "Value", "Return", "Variance", "Time", "Optimal Weights"])
+        sheet.append(["Model", "Policy", "Vectorized", "Vector Size", "Shuffle Vector", "Seed", "Timesteps", "Data", "n_steps", "batch_size", "net_arch", "random_nn", "random_data", "cardinality_constraint", "card mode", "lambda", "shrinkage", "sigma", "Value", "Return", "Variance", "Time", "Optimal Weights"])
         print("Sheet created.")
     else:
         sheet = workbook[sheet_name]
@@ -493,7 +493,7 @@ def save_to_xlsx(vector_dict, model_dict, training_dict, env_dict, policy_dict, 
         print("Values don't exist. Adding values.")
         return False
     
-    values = [model_dict["model_name"].__name__, model_dict["policy"], "Yes", vector_dict["vector_size"], vector_dict["shuffle"], training_dict["max_iteration"], training_dict["n_timesteps"], env_dict["data"].shape[1], model_dict["n_steps"], model_dict["batch_size"] if "batch_size" in model_dict else "-", str(policy_dict["net_arch"]), env_dict["random_nn"], env_dict["random_data"], env_dict["cardinality_constraint"], env_dict["cardinality_constraint_mode"], env_dict["lambda_regularization"], env_dict["shrinkage"], env_dict["sigma"], info["optimal_value"], info["expected_return"], info["variance"], info["training time"], str(info["optimal_weights"])]
+    values = [model_dict["model_name"].__name__, model_dict["policy"], "Yes", vector_dict["vector_size"], vector_dict["shuffle"], training_dict["seed"], training_dict["n_timesteps"], env_dict["data"].shape[1], model_dict["n_steps"], model_dict["batch_size"] if "batch_size" in model_dict else "-", str(policy_dict["net_arch"]), env_dict["random_nn"], env_dict["random_data"], env_dict["cardinality_constraint"], env_dict["cardinality_constraint_mode"], env_dict["lambda_regularization"], env_dict["shrinkage"], env_dict["sigma"], info["optimal_value"], info["expected_return"], info["variance"], info["training time"], str(info["optimal_weights"])]
     # "Vectorized" = "Yes" hardcoded for now since it's always vectorized
     if not values_exist(sheet, values):
         row = find_first_empty_row(sheet)
